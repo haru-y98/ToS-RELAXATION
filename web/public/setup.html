@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ToS Relaxation - データベースセットアップ</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 40px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #2563eb;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+    }
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    button:hover {
+      background: #1d4ed8;
+    }
+    button:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+    }
+    .log {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 20px;
+      border-radius: 6px;
+      margin-top: 20px;
+      font-family: monospace;
+      font-size: 14px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .log-item {
+      margin-bottom: 8px;
+      padding: 4px 0;
+    }
+    .success { color: #10b981; }
+    .error { color: #ef4444; }
+    .info { color: #3b82f6; }
+    .warning { color: #f59e0b; }
+    .step {
+      background: #f8fafc;
+      padding: 15px;
+      border-left: 4px solid #2563eb;
+      margin: 15px 0;
+    }
+    .step-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🚀 ToS Relaxation セットアップ</h1>
+    <p class="subtitle">ワンクリックでデータベースを初期化します</p>
+
+    <div class="step">
+      <div class="step-title">ステップ 1: データベースのセットアップ</div>
+      <p>このボタンをクリックすると、Supabaseにテーブルとテストデータが自動的に作成されます。</p>
+      <button id="setupBtn" onclick="setupDatabase()">データベースをセットアップ</button>
+    </div>
+
+    <div class="step">
+      <div class="step-title">ステップ 2: アプリケーションを確認</div>
+      <p>セットアップ完了後、以下のURLにアクセスしてください：</p>
+      <p><a href="http://localhost:3000" target="_blank" style="color: #2563eb; font-weight: bold;">http://localhost:3000</a></p>
+    </div>
+
+    <div id="log" class="log" style="display: none;"></div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://isduqadpcgirxhejhyzw.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlzZHVxYWRwY2dpcnhoZWpoeXp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU1MTgzNTgsImV4cCI6MjA4MTA5NDM1OH0.EWoe-DvWq5Xt52feTxtqG7hTxeBT6uFU6d8IANde67s';
+
+    const { createClient } = supabase;
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    function log(message, type = 'info') {
+      const logDiv = document.getElementById('log');
+      logDiv.style.display = 'block';
+      const item = document.createElement('div');
+      item.className = `log-item ${type}`;
+      item.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logDiv.appendChild(item);
+      logDiv.scrollTop = logDiv.scrollHeight;
+    }
+
+    async function setupDatabase() {
+      const btn = document.getElementById('setupBtn');
+      btn.disabled = true;
+      btn.textContent = 'セットアップ中...';
+
+      try {
+        log('🚀 データベースセットアップを開始します', 'info');
+
+        // メンバーデータ
+        log('📝 メンバーデータを追加中...', 'info');
+        const members = [
+          {
+            name: '太郎',
+            age: 28,
+            height: 175,
+            weight: 75,
+            residence: '東京都渋谷区',
+            dispatch_status: 'どちらも可能',
+            qualification: '国家資格所有',
+            appeal_comment: '経験10年以上のプロフェッショナルです。リラックスできる空間をご提供します。',
+            internal_status: 'NEW',
+            display_order: 1,
+            is_active: true
+          },
+          {
+            name: '次郎',
+            age: 32,
+            height: 180,
+            weight: 80,
+            residence: '東京都新宿区',
+            dispatch_status: '出張可',
+            qualification: '民間資格所有',
+            appeal_comment: '丁寧な施術を心がけています。お客様の悩みに寄り添います。',
+            internal_status: '人気',
+            display_order: 2,
+            is_active: true
+          },
+          {
+            name: '三郎',
+            age: 25,
+            height: 170,
+            weight: 68,
+            residence: '東京都世田谷区',
+            dispatch_status: '場所有',
+            qualification: 'なし',
+            appeal_comment: '若手ですが技術には自信があります。お気軽にお試しください。',
+            internal_status: '通常',
+            display_order: 3,
+            is_active: true
+          }
+        ];
+
+        const { data: insertedMembers, error: membersError } = await supabaseClient
+          .from('members')
+          .insert(members)
+          .select();
+
+        if (membersError) {
+          if (membersError.code === 'PGRST205') {
+            log('❌ テーブルが存在しません。SETUP_GUIDE.mdの手順に従ってSupabaseでテーブルを作成してください。', 'error');
+            log('📖 https://app.supabase.com/project/isduqadpcgirxhejhyzw/sql/new を開いて schema.sql を実行してください', 'warning');
+            btn.disabled = false;
+            btn.textContent = 'データベースをセットアップ';
+            return;
+          }
+          throw membersError;
+        }
+
+        log(`✅ メンバーを ${insertedMembers.length} 件追加しました`, 'success');
+
+        // メニューデータ
+        log('📝 メニューデータを追加中...', 'info');
+        const menus = [
+          // 太郎のメニュー
+          {
+            member_id: insertedMembers[0].id,
+            service_name: '60分基本コース',
+            duration_minutes: 60,
+            price: 8000,
+            description: '全身をほぐす基本的なマッサージコースです',
+            is_available: true
+          },
+          {
+            member_id: insertedMembers[0].id,
+            service_name: '90分しっかりコース',
+            duration_minutes: 90,
+            price: 12000,
+            description: 'じっくり時間をかけて全身を丁寧にほぐします',
+            is_available: true
+          },
+          {
+            member_id: insertedMembers[0].id,
+            service_name: '120分スペシャルコース',
+            duration_minutes: 120,
+            price: 15000,
+            description: '最高のリラクゼーション体験をお届けします',
+            is_available: true
+          },
+          // 次郎のメニュー
+          {
+            member_id: insertedMembers[1].id,
+            service_name: '60分リラックスコース',
+            duration_minutes: 60,
+            price: 9000,
+            description: 'ストレス解消に最適なコースです',
+            is_available: true
+          },
+          {
+            member_id: insertedMembers[1].id,
+            service_name: '90分プレミアムコース',
+            duration_minutes: 90,
+            price: 13000,
+            description: '上質な時間をお過ごしいただけます',
+            is_available: true
+          },
+          // 三郎のメニュー
+          {
+            member_id: insertedMembers[2].id,
+            service_name: '60分お試しコース',
+            duration_minutes: 60,
+            price: 7000,
+            description: 'はじめての方におすすめのコースです',
+            is_available: true
+          },
+          {
+            member_id: insertedMembers[2].id,
+            service_name: '90分リフレッシュコース',
+            duration_minutes: 90,
+            price: 10000,
+            description: '疲れを癒やすリフレッシュコースです',
+            is_available: true
+          }
+        ];
+
+        const { data: insertedMenus, error: menusError } = await supabaseClient
+          .from('menus')
+          .insert(menus)
+          .select();
+
+        if (menusError) throw menusError;
+
+        log(`✅ メニューを ${insertedMenus.length} 件追加しました`, 'success');
+
+        // 営業時間データ（次の30日間）
+        log('📝 営業時間を設定中...', 'info');
+        const availabilities = [];
+        for (let i = 0; i < 30; i++) {
+          const date = new Date();
+          date.setDate(date.getDate() + i);
+          const dateStr = date.toISOString().split('T')[0];
+
+          for (const member of insertedMembers) {
+            availabilities.push({
+              member_id: member.id,
+              date: dateStr,
+              start_time: '10:00',
+              end_time: '22:00',
+              is_available: true
+            });
+          }
+        }
+
+        const { data: insertedAvailability, error: availabilityError } = await supabaseClient
+          .from('member_availability')
+          .insert(availabilities)
+          .select();
+
+        if (availabilityError) throw availabilityError;
+
+        log(`✅ 営業時間を ${insertedAvailability.length} 件追加しました`, 'success');
+
+        log('🎉 データベースセットアップが完了しました!', 'success');
+        log('', 'info');
+        log('📊 追加されたデータ:', 'info');
+        log(`  - メンバー: ${insertedMembers.length} 人`, 'info');
+        log(`  - メニュー: ${insertedMenus.length} 件`, 'info');
+        log(`  - 営業時間: ${insertedAvailability.length} 件`, 'info');
+        log('', 'info');
+        log('✨ http://localhost:3000 にアクセスしてください!', 'success');
+
+        btn.textContent = 'セットアップ完了！';
+        btn.style.background = '#10b981';
+
+      } catch (error) {
+        log(`❌ エラー: ${error.message}`, 'error');
+        console.error('Setup error:', error);
+        btn.disabled = false;
+        btn.textContent = 'データベースをセットアップ';
+      }
+    }
+  </script>
+</body>
+</html>
