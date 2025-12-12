@@ -1,0 +1,18 @@
+import { supabase } from '@/lib/supabase'
+import { NextResponse } from 'next/server'
+
+export async function GET() {
+  try {
+    const { data, error } = await supabase
+      .from('members')
+      .select('*')
+      .eq('is_active', true)
+      .order('display_order', { ascending: true })
+
+    if (error) throw error
+
+    return NextResponse.json(data)
+  } catch (error) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 })
+  }
+}
